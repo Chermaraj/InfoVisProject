@@ -15,8 +15,6 @@ def home(request):
                 'year':datetime.now().year,
                 "stationObject": stat_list,
                 } 
-
-
     assert isinstance(request, HttpRequest)
     return render(
         request,

@@ -1,56 +1,194 @@
-{% extends "app/layout.html" %}
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+{% load static %}
+<link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
+<style>
+.province{
+        fill:#ccc;
+    }
 
-{% block content %}
+.background {
+  fill: none;
+  pointer-events: all;
+}
 
-<div class="jumbotron">
-    <h1>Django</h1>
-    <p class="lead">Django is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://www.djangoproject.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
+.tooltip {
+  font-weight: bold;
+  padding: 0.5rem;
+  border: 1px solid silver;
+}
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            Django gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://djangobook.com/django-tutorials/">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.org/">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Microsoft Azure</h2>
-        <p>You can easily publish to Microsoft Azure using Visual Studio. Find out how you can host your application using a free trial today.</p>
-        <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
-    </div>
-</div>
-<div>
-    
-<table>
-<thead>
-      <tr>
-         <th>Station Names</th>
-      </tr>
-   </thead>
+.hidden {
+  display: none;
+}
+.feature {
+  fill: #ccc;
+  cursor: pointer;
+}
 
-   <tbody>  
-       {% for info in stationObject %}
-      <tr>
+.feature.active {
+  fill: cornflowerblue;
+}
 
-         <td>{{ info.stat_name }}</td>
-      </tr>
+.mesh {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-       {% endfor %}
+.infoBox{
 
-   </tbody>
- 
+        position:absolute;
+        width:200;
+        height:200;
+        padding: 10px;
+        background-color: blue;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
 
-</table>
-</div>
+    }
 
-{% endblock %}
+
+
+    .infoBox.hidden{
+
+        display:none;
+
+    }
+
+
+    .infoBox.p{
+
+        font-size:16px;
+    }
+
+    .tooltip {
+  font-weight: bold;
+  padding: 0.5rem;
+  border: 1px solid silver;
+  visibility: visible;
+    }
+
+  .hidden {
+  display: none;
+   }
+
+</style>
+<title>D3 Map Programming</title>
+</head>
+<body>
+<script type="text/JavaScript">
+var width = 1000,
+    height = 700,
+    active = d3.select(null);
+
+var projection = d3.geo.albers()
+    .scale(1000).center([0,60])
+    .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("rect")
+    .attr("class", "background")
+    .attr("width", width)
+    .attr("height", height)
+    .on("click", reset);
+
+var g = svg.append("g")
+        .style("stroke-width", "1.5px");
+
+
+ var infoBox = svg.selectAll("text")
+        .data("data")
+        .enter()
+        .append("text");
+
+
+
+var url = "/static/Canadaprovince.geojson"
+
+    d3.json(url, function (error, topology) { 
+        console.log(topology)
+      
+  g.selectAll("path")
+      .data(topology.features) 
+      .enter().append("path")
+      .attr("d", path)
+      .attr("class", "feature")
+      .on("click", clicked)      
+      .on('mouseover',showName);
+
+  g.append("path")
+      .datum(topology.features)
+      .attr("class", "mesh")
+      .attr("d", path);
+    });
+
+
+  function showName(d) {
+  if (active.node() === this) return reset();
+    active.classed("active", false);
+    active = d3.select(this).classed("active", true);
+
+      tooltip.text(d.properties.NAME)          
+     .attr("class", "tooltip hidden");;
+    }
+
+function clicked(d) {
+  if (active.node() === this) return reset();
+    active.classed("active", false);
+    active = d3.select(this).classed("active", true);
+
+    infoBox
+    .datum(d)
+    .text(d.properties.NAME);
+    console.log(d.properties.NAME);
+
+  var bounds = path.bounds(d),
+      dx = bounds[1][0] - bounds[0][0],
+      dy = bounds[1][1] - bounds[0][1],
+      x = (bounds[0][0] + bounds[1][0]) / 2,
+      y = (bounds[0][1] + bounds[1][1]) / 2,
+      scale = .9 / Math.max(dx / width, dy / height),
+        translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+    infoBox.transition()
+            .duration(1250)
+            .style("opacity", "100")
+
+  g.transition()
+      .duration(750)
+      .style("stroke-width", 1.5 / scale + "px")
+        .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+
+}
+
+    function reset() {
+  active.classed("active", false);
+  active = d3.select(null);
+
+  g.transition()
+      .duration(750)
+      .style("stroke-width", "1.5px")
+      .attr("transform", "");
+    }
+
+
+</script>
+</body>
+</html>
