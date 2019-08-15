@@ -9,5 +9,6 @@ from VisualApp import forms, views
 
 
 urlpatterns = [
-    url('', views.home, name='home'),
+    url(r'^$',views.home, name='home'),
+    url(r'^canada_climate', views.climate, name='climate')
 ]

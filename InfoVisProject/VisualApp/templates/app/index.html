@@ -1,194 +1,134 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://d3js.org/topojson.v1.min.js"></script>
-{% load static %}
-<link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
-<style>
-.province{
-        fill:#ccc;
-    }
-
-.background {
-  fill: none;
-  pointer-events: all;
-}
-
-.tooltip {
-  font-weight: bold;
-  padding: 0.5rem;
-  border: 1px solid silver;
-}
-
-.hidden {
-  display: none;
-}
-.feature {
-  fill: #ccc;
-  cursor: pointer;
-}
-
-.feature.active {
-  fill: cornflowerblue;
-}
-
-.mesh {
-  fill: none;
-  stroke: #fff;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.infoBox{
-
-        position:absolute;
-        width:200;
-        height:200;
-        padding: 10px;
-        background-color: blue;
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-        -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-        -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-        pointer-events: none;
-
-    }
+  <title>Dashboard</title>
+    {% load staticfiles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/keen-dashboards.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/dc.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'visualapp/css/custom.css' %}" />
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
 
 
 
-    .infoBox.hidden{
-
-        display:none;
-
-    }
-
-
-    .infoBox.p{
-
-        font-size:16px;
-    }
-
-    .tooltip {
-  font-weight: bold;
-  padding: 0.5rem;
-  border: 1px solid silver;
-  visibility: visible;
-    }
-
-  .hidden {
-  display: none;
-   }
-
-</style>
-<title>D3 Map Programming</title>
 </head>
-<body>
-<script type="text/JavaScript">
-var width = 1000,
-    height = 700,
-    active = d3.select(null);
+<body class="application">
 
-var projection = d3.geo.albers()
-    .scale(1000).center([0,60])
-    .translate([width / 2, height / 2]);
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid"> 
+      <div class="navbar-header">
+        <a class="navbar-brand" href="./">Canada Precipitation Dashboard</a>
+      </div>
+    </div>
+  </div>
 
-var path = d3.geo.path()
-    .projection(projection);
+  <div class="container-fluid">
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    <div class="row">
 
-svg.append("rect")
-    .attr("class", "background")
-    .attr("width", width)
-    .attr("height", height)
-    .on("click", reset);
+          <!-- Map -->  
+     <div class="col-sm-6" >
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Distribution of precipitation in Canada
+          </div>
+          <div class="chart-stage">
+            <div id="canada-chart"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Map -->
 
-var g = svg.append("g")
-        .style("stroke-width", "1.5px");
+      <div class="col-sm-6">
+        <div class="row">
+ 
 
+          <!-- Season Chart-->
+          <div class="col-sm-6">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Precipitation in season level
+              </div>
+              <div class="chart-stage" >
+                <div id="season-level-row-chart"></div>
+              </div>
+            </div>
+          </div>
+          <!--  Season Chart -->
 
- var infoBox = svg.selectAll("text")
-        .data("data")
-        .enter()
-        .append("text");
+          <!-- Monthly Chart -->
+          <div class="col-sm-6">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Precipitation in month level
+              </div>
+              <div class="chart-stage">
+                <div id="month-level-line-chart"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Monthly Chart -->
+		  
+		        <!-- Metric 1 -->
+      <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Need to decide
+          </div>
+          <div class="chart-stage">
+            <div id="precip-level"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Metric 1 -->
 
+      <!-- Metric 2 -->
+      <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Average Precipitation in mm
+          </div>
+          <div class="chart-stage">
+            <div id="avg-precip"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Metric 2 -->
 
+        </div>
+      </div>
 
-var url = "/static/Canadaprovince.geojson"
-
-    d3.json(url, function (error, topology) { 
-        console.log(topology)
       
-  g.selectAll("path")
-      .data(topology.features) 
-      .enter().append("path")
-      .attr("d", path)
-      .attr("class", "feature")
-      .on("click", clicked)      
-      .on('mouseover',showName);
-
-  g.append("path")
-      .datum(topology.features)
-      .attr("class", "mesh")
-      .attr("d", path);
-    });
+          <!-- Time Chart --> 
+          <div class="col-sm-12">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Time line               </div>
+              <div class="chart-stage">
+                <div id="time-chart"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Time Chart -->
 
 
-  function showName(d) {
-  if (active.node() === this) return reset();
-    active.classed("active", false);
-    active = d3.select(this).classed("active", true);
 
-      tooltip.text(d.properties.NAME)          
-     .attr("class", "tooltip hidden");;
-    }
+    </div>
 
-function clicked(d) {
-  if (active.node() === this) return reset();
-    active.classed("active", false);
-    active = d3.select(this).classed("active", true);
+  </div>
 
-    infoBox
-    .datum(d)
-    .text(d.properties.NAME);
-    console.log(d.properties.NAME);
+  <div>
+    
+    
+   </div>
 
-  var bounds = path.bounds(d),
-      dx = bounds[1][0] - bounds[0][0],
-      dy = bounds[1][1] - bounds[0][1],
-      x = (bounds[0][0] + bounds[1][0]) / 2,
-      y = (bounds[0][1] + bounds[1][1]) / 2,
-      scale = .9 / Math.max(dx / width, dy / height),
-        translate = [width / 2 - scale * x, height / 2 - scale * y];
-
-    infoBox.transition()
-            .duration(1250)
-            .style("opacity", "100")
-
-  g.transition()
-      .duration(750)
-      .style("stroke-width", 1.5 / scale + "px")
-        .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-
-}
-
-    function reset() {
-  active.classed("active", false);
-  active = d3.select(null);
-
-  g.transition()
-      .duration(750)
-      .style("stroke-width", "1.5px")
-      .attr("transform", "");
-    }
-
-
-</script>
+  <script src="{% static 'visualapp/lib/js/jquery.min.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/crossfilter.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/d3.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/dc.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/queue.js' %}"></script>
+  <script src="{% static 'visualapp/js/graphs.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/keen.min.js' %}"></script>
 </body>
 </html>

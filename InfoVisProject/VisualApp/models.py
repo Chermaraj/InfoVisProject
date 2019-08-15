@@ -74,6 +74,27 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
+class CanadaAggData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    data_year = models.IntegerField(blank=True, null=True)
+    data_month = models.IntegerField(blank=True, null=True)
+    season = models.CharField(max_length=6, blank=True, null=True)
+    stat_n_month = models.IntegerField(blank=True, null=True)
+    stat_n_year = models.IntegerField(blank=True, null=True)
+    stat_n_season = models.IntegerField(blank=True, null=True)
+    month_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    season_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    year_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+    province_name = models.CharField(max_length=100, blank=True, null=True)
+    month_label = models.CharField(max_length=6, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_agg_data'
+
+
 class CanadaDataTemp(models.Model):
     stat_name = models.CharField(max_length=100, blank=True, null=True)
     latitude = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
@@ -102,10 +123,129 @@ class CanadaDataTemp(models.Model):
     climat_id = models.CharField(max_length=10, blank=True, null=True)
     data_month = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     data_year = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    season = models.CharField(max_length=6, blank=True, null=True)
+    decade = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    period = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    data_mon_year = models.CharField(max_length=12, blank=True, null=True)
+    data_mon_yr = models.DateField(blank=True, null=True)
+    year_num = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'canada_data_temp'
+
+
+class CanadaMonthData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    data_year = models.IntegerField(blank=True, null=True)
+    data_month = models.IntegerField(blank=True, null=True)
+    stat_count = models.IntegerField(blank=True, null=True)
+    total_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    avg_total_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_month_data'
+
+
+class CanadaMontlyData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    month_total_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    avg_monthy_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    differ_avg_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    days_w_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    avg_days = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    differ_avg_days = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    data_month = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    data_year = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_montly_data'
+
+
+class CanadaSeasonData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    data_year = models.IntegerField(blank=True, null=True)
+    season = models.CharField(max_length=7, blank=True, null=True)
+    stat_count = models.IntegerField(blank=True, null=True)
+    year_num = models.IntegerField(blank=True, null=True)
+    cur_yr_totl_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    prev_yr_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    cur_yr_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    total_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    global_precip_avg = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    differ_precip_avg = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    differ_precip_inch = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_season_data'
+
+
+class CanadaSeasons(models.Model):
+    data_month = models.IntegerField(blank=True, null=True)
+    season = models.CharField(max_length=8, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_seasons'
+
+
+class CanadaStatSeasonData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    stat_name = models.CharField(max_length=70, blank=True, null=True)
+    data_year = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    season = models.CharField(max_length=8, blank=True, null=True)
+    total_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    avg_total_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_stat_season_data'
+
+
+class CanadaStationData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    stat_name = models.CharField(max_length=70, blank=True, null=True)
+    data_year = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    total_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    avg_total_precip = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+    period = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    year_num = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_station_data'
+
+
+class CanadaYearlyData(models.Model):
+    province = models.CharField(max_length=2, blank=True, null=True)
+    stat_count = models.IntegerField(blank=True, null=True)
+    data_year = models.IntegerField(blank=True, null=True)
+    year_total_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    previous_yr_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    current_yr_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    total_avg_precip = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    global_precip_avg = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    differ_precip_avg = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    differ_precip_inch = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    created_by = models.CharField(max_length=6, blank=True, null=True)
+    created_on = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'canada_yearly_data'
 
 
 class DjangoAdminLog(models.Model):
