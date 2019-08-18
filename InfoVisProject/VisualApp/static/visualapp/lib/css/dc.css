@@ -202,6 +202,10 @@ div.dc-chart {
     cursor: pointer;
 }
 
+.dc-chart g.row text {
+    fill: white;
+}
+
 .dc-legend {
     font-size: 11px;
 }

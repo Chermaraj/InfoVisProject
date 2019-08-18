@@ -4,7 +4,7 @@
   <title>Dashboard</title>
     {% load staticfiles %}
   <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/bootstrap.min.css' %}" />
-  <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/keen-dashboards.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/dashboards.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'visualapp/lib/css/dc.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'visualapp/css/custom.css' %}" />
   <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
@@ -48,7 +48,22 @@
             <div class="chart-wrapper">
               <div class="chart-title">
                 Precipitation in season level
-              </div>
+                    <span>
+          <a class="reset"
+            href="javascript:seasonTypeChart.filterAll();dc.redrawAll();"
+            style="display: none;">
+            reset
+          </a>
+        </span>
+                 </div>
+                <span>
+          <a class="reset"
+            href="javascript:dayOfWeekChart.filterAll();dc.redrawAll();"
+            style="display: none;">
+            reset
+          </a>
+        </span>
+
               <div class="chart-stage" >
                 <div id="season-level-row-chart"></div>
               </div>
@@ -61,6 +76,14 @@
             <div class="chart-wrapper">
               <div class="chart-title">
                 Precipitation in month level
+                  <span>
+          <a class="reset"
+            href="javascript:dayOfWeekChart.filterAll();dc.redrawAll();"
+            style="display: none;">
+            reset
+          </a>
+        </span>
+
               </div>
               <div class="chart-stage">
                 <div id="month-level-line-chart"></div>
@@ -71,13 +94,28 @@
 		  
 		        <!-- Metric 1 -->
       <div class="col-sm-6">
+          <div class="row">
+            <div class="col-sm-6">
         <div class="chart-wrapper">
           <div class="chart-title">
-            Need to decide
-          </div>
+            From Year
+               </div>
           <div class="chart-stage">
-            <div id="precip-level"></div>
+            <div id="from-year"></div>
           </div>
+        </div>
+         </div>
+
+               <div class="col-sm-6">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+           To Year
+               </div>
+          <div class="chart-stage">
+            <div id="to-year"></div>
+          </div>
+        </div>
+         </div>
         </div>
       </div>
       <!-- Metric 1 -->
@@ -89,7 +127,7 @@
             Average Precipitation in mm
           </div>
           <div class="chart-stage">
-            <div id="avg-precip"></div>
+            <div id="avg-preciption"></div>
           </div>
         </div>
       </div>
@@ -129,6 +167,6 @@
   <script src="{% static 'visualapp/lib/js/dc.js' %}"></script>
   <script src="{% static 'visualapp/lib/js/queue.js' %}"></script>
   <script src="{% static 'visualapp/js/graphs.js' %}"></script>
-  <script src="{% static 'visualapp/lib/js/keen.min.js' %}"></script>
+  <script src="{% static 'visualapp/lib/js/dashboard.min.js' %}"></script>
 </body>
 </html>

@@ -1,12 +1,16 @@
-#number-projects-nd {
+#from-year {
     font-size: 60px;
 }
 
-#total-donations-nd {
+#to-year {
+    font-size: 60px;
+}
+
+#avg-preciption {
     font-size: 60px;
 }
 
 .dc-chart g.row text {
-    fill: black;
+    fill: white;
     font-size: 12px;
 }

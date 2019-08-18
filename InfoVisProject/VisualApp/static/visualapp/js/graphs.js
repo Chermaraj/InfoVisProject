@@ -20,8 +20,24 @@ function makeGraphs(error, projectsJson, statesJson) {
 
 
     //Define Dimensions
-    var yearDim = ndx.dimension(function (d) { return d["data_year"]; });
-    var seasonTypeDim = ndx.dimension(function (d) { return d["season"]; });
+    var yearDim = ndx.dimension(function (d) {
+        return d["data_year"];
+    });
+    //var seasonTypeDim = ndx.dimension(function (d) { return d["season"]; });
+    var seasonTypeDim = ndx.dimension(function (d) {
+        var season = d["season"];
+        switch (season) {
+            case "Winter":
+                return "0.Winter";
+            case "Spring":
+                return "2.Spring";
+            case "Summer":
+                return "3.Summer";
+            case "Fall":
+                return "4.Fall";
+        }
+    });
+    var seasonGroup = seasonTypeDim.group();
     var monthDim = ndx.dimension(function (d) { return d["data_month"]; });
     var monthLabel = ndx.dimension(function (d) { return d["month_label"] });
     var stateDim = ndx.dimension(function (d) { return d["province_name"]; });
@@ -118,6 +134,8 @@ function makeGraphs(error, projectsJson, statesJson) {
             };
         }
     );
+
+    
     var totalPreciptionsByState = stateDim.group().reduce(function (p, v) {
         ++p.count;
         p.total += v.month_avg_precip;
@@ -151,7 +169,7 @@ function makeGraphs(error, projectsJson, statesJson) {
 
     var all = ndx.groupAll();
     var total_years = yearDim.group()
-    var totalDonations = ndx.groupAll().reduce(function (p, v) {
+    var averagePrecip = ndx.groupAll().reduce(function (p, v) {
         ++p.count;
         p.total += v.month_avg_precip;
         if (p.count == 0) {
@@ -183,8 +201,17 @@ function makeGraphs(error, projectsJson, statesJson) {
         }
     );
 
-    var max_state = totalPreciptionsByState.top(1)[0].value.average;
-    console.log(totalPreciptionsByState)
+    function orderValue(p) {
+        return p.average;
+    }
+
+    //Define max_state and min_state
+    var topaverage = totalPreciptionsByState.order(orderValue).top(15);
+    var max_state = topaverage[0].value.average;
+    var min_state = topaverage[13].value.average;
+    console.log("min_state", min_state)
+    console.log("max_state", min_state)
+
     //Define values (to be used in charts)
     var minDate = yearDim.bottom(1)[0]["data_year"];
     var maxDate = yearDim.top(1)[0]["data_year"];
@@ -193,18 +220,42 @@ function makeGraphs(error, projectsJson, statesJson) {
     var seasonTypeChart = dc.rowChart("#season-level-row-chart");
     var monthlyPrecipitationChart = dc.lineChart("#month-level-line-chart");
     var canadaChart = dc.geoChoroplethChart("#canada-chart");
-    var numberProjectsND = dc.numberDisplay("#precip-level");
-    var totalPreciptionND = dc.numberDisplay("#avg-precip");
+    var fromYearND = dc.numberDisplay("#from-year");
+    var toYearND = dc.numberDisplay("#to-year");
+    var avgPrecipitationND = dc.numberDisplay("#avg-preciption");
 
-    numberProjectsND
+    function dim_max_groupAll(dim, field) {
+        return {
+            value: function () {
+                return dim.top(1)[0][field];
+            }
+        };
+    }
+
+    function dim_min_groupAll(dim, field) {
+        return {
+            value: function () {
+                return dim.bottom(1)[0][field];
+            }
+        };
+    }
+
+    toYearND
         .formatNumber(d3.format("d"))
-        .valueAccessor(function (d) { return d; })
-        .group(all);
+        .group(dim_max_groupAll(yearDim, 'data_year'))
+        .valueAccessor(x => x);
 
-    totalPreciptionND
+    fromYearND
+        .width(320)
+        .height(150)
+        .formatNumber(d3.format("d"))
+        .group(dim_min_groupAll(yearDim, 'data_year'))
+        .valueAccessor(x => x);
+
+    avgPrecipitationND
         .formatNumber(d3.format("d"))
         .valueAccessor(function (d) { return d["average"]; })
-        .group(totalDonations)
+        .group(averagePrecip)
         .formatNumber(d3.format(".3s"));
 
     timeChart
@@ -227,13 +278,12 @@ function makeGraphs(error, projectsJson, statesJson) {
         .group(precipitationBySeason)
         .dimension(seasonTypeDim)
         .valueAccessor(function (p) { return p.value.count > 0 ? p.value.total / p.value.count : 0; })
-        .colors('#6baed6')
+        .colors('#3182bd')
         //Assign colors to each value in the x scale domain
         //.ordinalColors(['#ff4602', '#ff9c78', '#ff6229', '#ffd5c6'])
        // .ordinalColors(['#3182bd', '#6baed6', '#9ecae1','#dadaeb'])
         .label(function (d) {
-            console.log("d.key",d.key)
-            return d.key;
+            return d.key.split(".")[1];
         })
         //Title sets the row text
         .title(function (p) {
@@ -245,7 +295,7 @@ function makeGraphs(error, projectsJson, statesJson) {
     monthlyPrecipitationChart
         .width(380)
         .height(250)
-        .x(d3.scaleOrdinal().domain(monthLabel))
+        .x(d3.scaleOrdinal().domain(monthLabel)) 
         .xUnits(dc.units.ordinal)
         //.xUnits(monthLabel)
         .dimension(monthLabel)
@@ -262,14 +312,9 @@ function makeGraphs(error, projectsJson, statesJson) {
         .dimension(stateDim)
         .group(totalPreciptionsByState)
         .valueAccessor(function (p) { return p.value.count > 0 ? p.value.total / p.value.count : 0; })
-        //.colors(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"])
-        //.colors(colors)
-        //.colorDomain([0, max_state])
-        //.colorAccessor(function (d, i) { return i; })
-        //.colors(d3.scaleQuantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
-        //.colors(d3.scaleQuantize().range(["#cae4fc", "#aad3fa", "#a2d0fa", "#95c7f5", "8fc5f7", "#79bdfc", "#64b1fa", "#4fa2f0", "#389fff", "#268ef0","#0275e0"]))
-        .colors(d3.scaleQuantize().range(["#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#0056a1"]))
-        .colorDomain([0, 130])
+        //.colors(d3.scaleQuantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0056a1"]))
+        .colors(d3.scaleQuantize().range(["#d3ebff", "#84c6ff", "#4aabff", "#0f90ff", "#007ce7", "#005298"]))
+        .colorDomain([min_state, max_state])
         .colorCalculator(function (d) { return d ? canadaChart.colors()(d) : '#ccc'; })
         .overlayGeoJson(statesJson["features"], "state", function (d) {
             return d.properties.name;

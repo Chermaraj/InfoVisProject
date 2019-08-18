@@ -203,7 +203,7 @@
     <Content Include="VisualApp\static\visualapp\js\graphs.js" />
     <Content Include="VisualApp\static\visualapp\lib\css\bootstrap.min.css" />
     <Content Include="VisualApp\static\visualapp\lib\css\dc.css" />
-    <Content Include="VisualApp\static\visualapp\lib\css\keen-dashboards.css" />
+    <Content Include="VisualApp\static\visualapp\lib\css\dashboards.css" />
     <Content Include="VisualApp\static\visualapp\lib\js\bootstrap.min.js" />
     <Content Include="VisualApp\static\visualapp\lib\js\crossfilter.js" />
     <Content Include="VisualApp\static\visualapp\lib\js\d3.js" />
@@ -212,7 +212,7 @@
     <Content Include="VisualApp\static\visualapp\lib\js\dc.min.js" />
     <Content Include="VisualApp\static\visualapp\lib\js\dc.min.js.map" />
     <Content Include="VisualApp\static\visualapp\lib\js\jquery.min.js" />
-    <Content Include="VisualApp\static\visualapp\lib\js\keen.min.js" />
+    <Content Include="VisualApp\static\visualapp\lib\js\dashboard.min.js" />
     <Content Include="VisualApp\static\visualapp\lib\js\queue.js" />
     <Content Include="VisualApp\templates\app\index.html" />
   </ItemGroup>
